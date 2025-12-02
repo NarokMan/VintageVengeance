@@ -18,10 +18,10 @@ store map data, the win screen will change to a
 'next level' screen or something similar.
 
 TO RUN:
-Open the vv.html file in a browser of choice.
-We know for a fact that the program runs in firefox
-and chrome, although we have heard that Canvas is not 
-supported in every browser.
+Run the index.html file as a server and it will run.
+We have the website hosted at https://www.cs.nmt.edu/~arodriguez/
+
+We have been using the 'Live Server' extension on Visual Studio Code.
 
 Please ensure the files stay in their same relative
 paths, as the game uses relative paths for the images.
@@ -33,4 +33,4 @@ pedestrians. Try to get as low a time as possible!
 
 TO PLAY:
 Drive the car by pressing the up, 
-left, and right arrow keys.
+left, down, and right arrow keys.
