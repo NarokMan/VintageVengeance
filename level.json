@@ -4,6 +4,7 @@
         {
             "level": 1,
             "bg_image": "parkinglotdraft2.png",
+            "opp_car": "oppcar1.png",
             "player_start": {
                 "x": 50,
                 "y": 50
@@ -43,6 +44,7 @@
         {
             "level": 2,
             "bg_image": "level2.png",
+            "opp_car": "oppcar2.png",
             "player_start": {
                 "x": 1700,
                 "y": 50
@@ -94,6 +96,7 @@
         {
             "level": 3,
             "bg_image": "level3.png",
+            "opp_car": "oppcar3.png",
             "player_start": {
                 "x": 50,
                 "y": 50
@@ -142,6 +145,7 @@
         {
             "level": 4,
             "bg_image": "level4.png",
+            "opp_car": "oppcar4.png",
             "player_start": {
                 "x": 50,
                 "y": 750

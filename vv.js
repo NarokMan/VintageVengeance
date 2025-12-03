@@ -4,8 +4,11 @@ const Game_states = {
     Menu: "menu",
     Playing: "playing",
     Level_Complete: "level_complete",
+    Game_complete: "game_complete",
     Level_Failed: "level_failed"
 };
+
+const debug = false;
 
 let level = 0;
 let current_game_state = Game_states.Menu;
@@ -14,10 +17,21 @@ const WIDTH = 1920;
 const HEIGHT = 1080;
 
 let current_time = 0;
-let best_time = localStorage.getItem("best_time")
-    ? parseFloat(localStorage.getItem("best_time"))
+let best_time_1 = localStorage.getItem("best_time_1")
+    ? parseFloat(localStorage.getItem("best_time_1"))
     : null;
 
+let best_time_2 = localStorage.getItem("best_time_2")
+    ? parseFloat(localStorage.getItem("best_time_2"))
+    : null;
+
+let best_time_3 = localStorage.getItem("best_time_3")
+    ? parseFloat(localStorage.getItem("best_time_3"))
+    : null;
+
+let best_time_4 = localStorage.getItem("best_time_4")
+    ? parseFloat(localStorage.getItem("best_time_4"))
+    : null;
 
 let audio = new Audio("backgroundMusic2.mp3");
 let squeal = new Audio("squeal.mp3");
@@ -134,12 +148,6 @@ function drawMenu(context, menu_img) {
 
    context.drawImage(menu_img, 0, 0, WIDTH, HEIGHT);
 
-    if (best_time !== null) {
-        context.font = "48px serif";
-        context.fillStyle = "white";
-        context.fillText("Best Time: " + best_time.toFixed(2) + "s", WIDTH / 2 - 180, HEIGHT / 2);
-    }
-
 }
 
 // Initializes the timer and game state at the start of a level
@@ -196,10 +204,6 @@ function draw_timer(context) {
     context.font = "24px monospace";
     context.fillText("Time: " + current_time.toFixed(2) + "s", 30, 40);
 
-    if (best_time !== null) {
-        context.fillText("Best: " + best_time.toFixed(2) + "s", 30, 70);
-    }
-
 }
 
 // Draws the level complete screen
@@ -215,9 +219,23 @@ function drawLevelComplete(context) {
     context.font = "28px serif";
     context.fillText("Your Time: " + current_time.toFixed(2) + "s", WIDTH / 2 - 120, HEIGHT / 2 - 40);
 
-    if (best_time !== null) {
-        context.fillText("Best Time: " + best_time.toFixed(2) + "s", WIDTH / 2 - 120, HEIGHT / 2 + 0);
+
+    switch (level + 1) {
+        case 1:
+            best_time = best_time_1;
+            break;
+        case 2:
+            best_time = best_time_2;
+            break;
+        case 3:
+            best_time = best_time_3;
+            break;
+        case 4:
+            best_time = best_time_4;
+            break;
     }
+    context.fillText("Best Time: " + best_time.toFixed(2) + "s", WIDTH / 2 - 120, HEIGHT / 2 + 0);
+
 
     context.fillText("Press 1 → Next Level", WIDTH / 2 - 120, HEIGHT / 2 + 70);
     context.fillText("Press 2 → Return to Menu", WIDTH / 2 - 140, HEIGHT / 2 + 110);
@@ -297,8 +315,8 @@ function update_opp_pos(opp) {
 
     opp.dangle += diff * 0.04;
 
-    opp.xspeed += Math.cos(opp.angle + 3.14 / 2) * 0.01;
-    opp.yspeed += Math.sin(opp.angle + 3.14 / 2) * 0.01;
+    opp.xspeed += Math.cos(opp.angle + 3.14 / 2) * 0.02;
+    opp.yspeed += Math.sin(opp.angle + 3.14 / 2) * 0.02;
 
     opp.center = {x: opp.x + opp.width / 2, y: opp.y + opp.height / 2};
 
@@ -450,13 +468,44 @@ function animate(context, player, bg, input_keys, level_config, preggos, opponen
             playSound();
 
             // check for level complete
-            if (overlap_detect(player, level_config.levels[level].target) && player.speed < 0.1) {
-                current_game_state = Game_states.Level_Complete;
-                current_time = (performance.now() - level_start_time) / 1000;
-                
-                if (best_time === null || current_time < best_time) {
-                    best_time = current_time;
-                    localStorage.setItem("best_time", best_time.toString());
+            if (overlap_detect(player, level_config.levels[level].target) && Math.abs(player.speed) < 0.1) {
+
+                if (level < level_config.levels.length - 1) {
+                    current_game_state = Game_states.Level_Complete;
+                    current_time = (performance.now() - level_start_time) / 1000;
+                    
+                    switch (level + 1) {
+                        case 1:
+                            if (best_time_1 === null || current_time < best_time_1) {
+                                best_time_1 = current_time;
+                                localStorage.setItem("best_time_" + (level + 1), best_time_1.toString());
+                            }
+                            break;
+                        case 2:
+                            if (best_time_2 === null || current_time < best_time_2) {
+                                best_time_2 = current_time;
+                                localStorage.setItem("best_time_" + (level + 1), best_time_2.toString());
+                            }
+                            break;
+                        case 3:
+                            if (best_time_3 === null || current_time < best_time_3) {
+                                best_time_3 = current_time;    
+                                localStorage.setItem("best_time_" + (level + 1), best_time_3.toString());
+                            }
+                            break;
+                        case 4:
+                            if (best_time_4 === null || current_time < best_time_4) {
+                                best_time_4 = current_time;    
+                                localStorage.setItem("best_time_" + (level + 1), best_time_4.toString());
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    current_game_state = Game_states.Game_complete;
+                    pauseSound();
+
                 }
 
             }
@@ -547,11 +596,15 @@ function animate(context, player, bg, input_keys, level_config, preggos, opponen
                 context.beginPath();
 
                 for (let j = 0; j < level_config.levels[level].num_nodes; j++) {
-                    context.rect(level_config.levels[level].opp_nodes[j].x, level_config.levels[level].opp_nodes[j].y, 10, 10); // draw target for debugging
+                    if (debug)
+                        context.rect(level_config.levels[level].opp_nodes[j].x, level_config.levels[level].opp_nodes[j].y, 10, 10); // draw target for debugging
                 }
                 
-                context.rect(player.corners[i].x, player.corners[i].y, 2, 2); // draw top-center corner for debugging
-                context.stroke();
+                if (debug)
+                    context.rect(player.corners[i].x, player.corners[i].y, 2, 2); // draw top-center corner for debugging
+                
+                if (debug)
+                    context.stroke();
             }
 
             current_time = (performance.now() - level_start_time) / 1000; 
@@ -565,7 +618,7 @@ function animate(context, player, bg, input_keys, level_config, preggos, opponen
 
             pauseSound();
 
-            console.log("STATE:", current_game_state, "1:", input_keys.num_1, "2:", input_keys.num_2);
+            //console.log("STATE:", current_game_state, "1:", input_keys.num_1, "2:", input_keys.num_2);
 
             if (input_keys.num_1) { // NEXT LEVEL
 
@@ -608,6 +661,24 @@ function animate(context, player, bg, input_keys, level_config, preggos, opponen
 
             break;
 
+        case Game_states.Game_complete:
+            context.clearRect(0, 0, WIDTH, HEIGHT);
+            context.fillStyle = "black";
+            context.fillRect(0, 0, WIDTH, HEIGHT);
+
+            context.fillStyle = "white";
+            context.font = "48px serif";
+            context.fillText("Congratulations!", WIDTH / 2 - 180, HEIGHT / 2 - 100);
+            context.font = "28px serif";
+            context.fillText("You have completed all levels!", WIDTH / 2 - 170, HEIGHT / 2 - 40);
+            context.fillText("Your Time: " + current_time.toFixed(2) + "s", WIDTH / 2 - 120, HEIGHT / 2 + 0);
+            
+            if (best_time_4 === null || current_time < best_time_4) {
+                best_time_4 = current_time;    
+                localStorage.setItem("best_time_" + (level + 1), best_time_4.toString());
+            }
+            
+            break;
         
         default:
             
@@ -650,6 +721,7 @@ function init_player(player, opp, preggos, level_config) {
     opp.current_target = 0;
     opp.targetx = level_config.levels[level].opp_nodes[opp.current_target].x;
     opp.targety = level_config.levels[level].opp_nodes[opp.current_target].y;
+    opp.image.src = level_config.levels[level].opp_car;
 
     const preggo_img = new Image();
     preggo_img.src = "fatso.png";
@@ -795,7 +867,7 @@ function setup(level_config) {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        console.log("Mouse:", mouseX, mouseY);
+        //console.log("Mouse:", mouseX, mouseY);
     });
 
     requestAnimationFrame(() => animate(ctx, player, bg_img, input_keys, level_config, preggos, opponent, menu_img));
